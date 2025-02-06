@@ -1,5 +1,6 @@
 const { Sequelize } = require('sequelize');
 const path = require('path');
+const seedDatabase = require('./seedData');
 
 // Create SQLite database connection
 const sequelize = new Sequelize({
@@ -12,19 +13,23 @@ const sequelize = new Sequelize({
 async function testConnection() {
     try {
         await sequelize.authenticate();
-        console.log('Database connection established successfully.');
+        console.log('Database connection has been established successfully.');
     } catch (error) {
         console.error('Unable to connect to the database:', error);
+        throw error;
     }
 }
 
 // Initialize database
 async function initializeDatabase() {
     try {
-        await sequelize.sync();
-        console.log('Database synchronized successfully.');
+        const Drink = require('./Drink');
+        await sequelize.sync({ force: true }); // This will drop and recreate tables
+        await seedDatabase(Drink);
+        console.log('Database initialized and seeded successfully.');
     } catch (error) {
-        console.error('Error synchronizing database:', error);
+        console.error('Error initializing database:', error);
+        throw error;
     }
 }
 

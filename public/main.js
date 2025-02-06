@@ -1,4 +1,4 @@
-const API_URL = 'https://meekandev-github-io.onrender.com';
+const API_URL = '';
 
 console.log(window.location.href.toString())
 
@@ -22,3 +22,31 @@ async function apiRequest(){
         console.log(error)
     }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the current environment
+    const isProd = window.location.hostname === 'meekandev.github.io';
+    const API_BASE = isProd ? 'https://meekandev-github-io.onrender.com' : '';
+
+    // Function to fetch drinks
+    async function fetchDrinks() {
+        try {
+            const response = await fetch(`${API_BASE}/api/drinks`);
+            if (!response.ok) throw new Error('Network response was not ok');
+            const drinks = await response.json();
+            return drinks;
+        } catch (error) {
+            console.error('Error fetching drinks:', error);
+            return [];
+        }
+    }
+
+    // Handle POS button click
+    const posButton = document.querySelector('#pos-button');
+    if (posButton) {
+        posButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = `${API_BASE}/pos`;
+        });
+    }
+});

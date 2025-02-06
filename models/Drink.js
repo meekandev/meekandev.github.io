@@ -10,21 +10,53 @@ const Drink = sequelize.define('Drink', {
         type: DataTypes.STRING,
         allowNull: false
     },
-    description: {
-        type: DataTypes.TEXT
+    hot: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     },
-    recipe: {
-        type: DataTypes.TEXT
+    iced: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     },
-    customizations: {
-        type: DataTypes.TEXT,
-        get() {
-            const rawValue = this.getDataValue('customizations');
-            return rawValue ? JSON.parse(rawValue) : [];
-        },
-        set(value) {
-            this.setDataValue('customizations', JSON.stringify(value));
-        }
+    menuBuildHot: {
+        type: DataTypes.JSON,
+        allowNull: true
+    },
+    menuBuildIced: {
+        type: DataTypes.JSON,
+        allowNull: true
+    },
+    abbreviation: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    instructions: {
+        type: DataTypes.JSON,
+        allowNull: true
+    },
+    hotBuild: {
+        type: DataTypes.JSON,
+        allowNull: true
+    },
+    icedBuild: {
+        type: DataTypes.JSON,
+        allowNull: true
+    },
+    build: {
+        type: DataTypes.JSON,
+        allowNull: true
+    },
+    whippedCream: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    },
+    topping: {
+        type: DataTypes.STRING,
+        allowNull: true
+    },
+    layered: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     }
 });
 
