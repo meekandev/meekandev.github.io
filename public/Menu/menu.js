@@ -1,3 +1,31 @@
+// Initialize app when DOM is loaded
+document.addEventListener('DOMContentLoaded', async () => {
+    const statusLight = document.querySelector('.statusLight');
+    const customerName = document.querySelector('.customerName');
+    
+    try {
+        // Fetch initial data
+        const drinks = await window.fetchDrinks();
+        if (!drinks || drinks.length === 0) {
+            throw new Error('No drinks data available');
+        }
+
+        // Update UI to show connection success
+        statusLight.style.backgroundColor = '#00ff00';
+        customerName.textContent = 'Connected';
+        
+        // Initialize the menu
+        createCat(drinks);
+        pageRender(null, drinks);
+        
+    } catch (error) {
+        console.error('Failed to initialize app:', error);
+        statusLight.style.backgroundColor = '#ff0000';
+        customerName.textContent = "Can't connect";
+        errorMessage('Cannot connect to server', 'red');
+    }
+});
+
 /*
 
 
