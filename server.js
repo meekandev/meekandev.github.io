@@ -3,6 +3,7 @@ const express = require('express')
 const app = express()
 const PORT = process.env.PORT || 8000
 const CORS = require('cors')
+const path = require('path')
 const { testConnection, initializeDatabase } = require('./models/db')
 const Drink = require('./models/Drink')
 
@@ -21,44 +22,22 @@ app.use(express.urlencoded({ extended: true }))
 
 // Static files
 app.use(express.static('public'))
-app.use('/PartnerHours', express.static(__dirname + '/public/PartnerHours'))
-app.use('/Menu', express.static(__dirname + '/public/Menu'))
-app.use('/coreDrinks', express.static(__dirname + '/public/CoreDrinks'))
-app.use('/IMG', express.static(__dirname + '/IMG'))
+app.use('/PartnerHours', express.static(path.join(__dirname, 'public/PartnerHours')))
+app.use('/Menu', express.static(path.join(__dirname, 'public/Menu')))
+app.use('/coreDrinks', express.static(path.join(__dirname, 'public/CoreDrinks')))
+app.use('/IMG', express.static(path.join(__dirname, 'IMG')))
 
-// Basic API Routes
-app.get('/api/drinks', async (req, res) => {
-    try {
-        const drinks = await Drink.findAll()
-        res.json(drinks)
-    } catch (error) {
-        console.error('Error fetching drinks:', error)
-        res.status(500).json({ error: error.message })
-    }
-})
+// Import routes
+const mainRoutes = require('./routes/main')
+const apiRoutes = require('./routes/API')
 
-app.get('/api/drinks/:id', async (req, res) => {
-    try {
-        const drink = await Drink.findByPk(req.params.id)
-        if (drink) {
-            res.json(drink)
-        } else {
-            res.status(404).json({ error: 'Drink not found' })
-        }
-    } catch (error) {
-        console.error('Error fetching drink:', error)
-        res.status(500).json({ error: error.message })
-    }
-})
+// Route handlers
+app.use('/', mainRoutes)
+app.use('/api', apiRoutes)
 
-app.post('/api/drinks', async (req, res) => {
-    try {
-        const drink = await Drink.create(req.body)
-        res.status(201).json(drink)
-    } catch (error) {
-        console.error('Error creating drink:', error)
-        res.status(400).json({ error: error.message })
-    }
+// Direct route for POS
+app.get('/pos', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/Menu/menu.html'))
 })
 
 // Health check endpoint
@@ -70,6 +49,12 @@ app.get('/health', (req, res) => {
     })
 })
 
+// Error handler
+app.use((err, req, res, next) => {
+    console.error(err.stack)
+    res.status(500).json({ error: 'Something broke!' })
+})
+
 // Initialize database and start server
 async function startServer() {
     try {
@@ -78,6 +63,7 @@ async function startServer() {
         
         app.listen(PORT, () => {
             console.log(`Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`)
+            console.log(`POS system available at: http://localhost:${PORT}/pos`)
         })
     } catch (error) {
         console.error('Failed to start server:', error)
