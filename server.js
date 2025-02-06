@@ -6,18 +6,25 @@ const CORS = require('cors')
 const { testConnection, initializeDatabase } = require('./models/db')
 const Drink = require('./models/Drink')
 
+// Configure CORS for production
+const corsOptions = {
+    origin: process.env.NODE_ENV === 'production' 
+        ? ['https://meekandev.github.io']
+        : ['http://localhost:3000', 'http://localhost:8000'],
+    optionsSuccessStatus: 200
+}
+
 // Middleware
-app.use(express.static('public'))
-app.use('/PartnerHours',express.static(__dirname + '/public/PartnerHours'))
-app.use('/Menu',express.static(__dirname + '/public/Menu'))
-app.use('/coreDrinks',express.static(__dirname + '/public/CoreDrinks'))
-app.use(express.static('IMG'))
-const bodyParser = require('body-parser')
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(CORS())
-app.use(express.urlencoded({ extended: true }))
-app.use('/IMG', express.static(__dirname + '/IMG'))
+app.use(CORS(corsOptions))
 app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
+// Static files
+app.use(express.static('public'))
+app.use('/PartnerHours', express.static(__dirname + '/public/PartnerHours'))
+app.use('/Menu', express.static(__dirname + '/public/Menu'))
+app.use('/coreDrinks', express.static(__dirname + '/public/CoreDrinks'))
+app.use('/IMG', express.static(__dirname + '/IMG'))
 
 // Basic API Routes
 app.get('/api/drinks', async (req, res) => {
@@ -25,6 +32,7 @@ app.get('/api/drinks', async (req, res) => {
         const drinks = await Drink.findAll()
         res.json(drinks)
     } catch (error) {
+        console.error('Error fetching drinks:', error)
         res.status(500).json({ error: error.message })
     }
 })
@@ -38,6 +46,7 @@ app.get('/api/drinks/:id', async (req, res) => {
             res.status(404).json({ error: 'Drink not found' })
         }
     } catch (error) {
+        console.error('Error fetching drink:', error)
         res.status(500).json({ error: error.message })
     }
 })
@@ -47,8 +56,18 @@ app.post('/api/drinks', async (req, res) => {
         const drink = await Drink.create(req.body)
         res.status(201).json(drink)
     } catch (error) {
+        console.error('Error creating drink:', error)
         res.status(400).json({ error: error.message })
     }
+})
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ 
+        status: 'ok',
+        environment: process.env.NODE_ENV,
+        timestamp: new Date().toISOString()
+    })
 })
 
 // Initialize database and start server
@@ -58,10 +77,11 @@ async function startServer() {
         await initializeDatabase()
         
         app.listen(PORT, () => {
-            console.log(`Server is running on port ${PORT}`)
+            console.log(`Server is running in ${process.env.NODE_ENV} mode on port ${PORT}`)
         })
     } catch (error) {
         console.error('Failed to start server:', error)
+        process.exit(1)
     }
 }
 
