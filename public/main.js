@@ -1,37 +1,17 @@
-
+const API_URL = 'https://meekandev-github-io.onrender.com';
 
 console.log(window.location.href.toString())
 
 function changeTheLinks(url){
-    document.querySelector('.drinkVis').href = url+'coreDrinks'
-    document.querySelector('.menu').href = url+'pos'
-    document.querySelector('.roasts').href = url+'roasts'
-    document.querySelector('.apiDrinks').href = url+'api/coreDrinks'
-    document.querySelector('.apiRoasts').href = url+'api/Roasts'
-    document.querySelector('.apiCust').href = url+'api/customizations'
+    document.querySelector('.apiDrinks').href = url+'api/drinks'
     document.querySelector('.apiCustomers').href = url+'api/allCustomers'
 }
 
-
-
-changeTheLinks(window.location.href.toString())
-
-
-
-
-
-
-
-
-
-
-
-
+changeTheLinks(API_URL + '/')
 
 async function apiRequest(){
-    
     try{
-        const response = await fetch(`https://cofee-trainer.herokuapp.com/api/coredrinks`)
+        const response = await fetch(`${API_URL}/api/coredrinks`)
         const data = await response.json()
 
         Object.keys(data).forEach(key => {

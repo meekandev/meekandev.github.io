@@ -1,5 +1,3 @@
-
-
 /*
 
 
@@ -176,7 +174,7 @@ document.querySelector('.void').addEventListener('click',async function voidItem
         errorMessage('Select an item to void','blue')
     }
 
-})
+}
 
 
 //adds drinks to the order
@@ -656,11 +654,38 @@ function addTheIcedWord(){
 
 
 
+const API_URL = 'https://meekandev-github-io.onrender.com';
+
+async function apiRequest(){
+    try{
+        const response = await fetch(`${API_URL}/api/drinks`)
+        const data = await response.json()
+        
+        Object.keys(data).forEach(key => {
+            createElements(data[key])
+        })
+    }catch(err){
+        console.log(err)
+    }
+}
+
+async function apiRequestForCustomizations(){
+    document.querySelector('.menuWrapper').classList.add('loading')
+    document.querySelector('.customerArea').classList.add('hidden')
+    statusLight.style.backgroundImage='linear-gradient(161deg,rgb(0, 0, 0),rgb(255, 0, 0))'
+    try{
+        const response = await fetch(`${API_URL}/api/customizations`)
+        const data = await response.json()
+        return data
+    }catch(err){
+        console.log(err)
+    }
+}
 let heroku = 'https://coffee-trainer.herokuapp.com/api/coredrinks'
 let local = 'http://localhost:8000/api/coredrinks'
 
 const statusLight = document.querySelector('.statusLight')
-async function apiRequest(url){  //Calls the API and brings drink data to the 
+async function apiRequestForCustomizations(url){  //Calls the API and brings drink data to the 
     document.querySelector('.menuWrapper').classList.add('loading')
     document.querySelector('.customerArea').classList.add('hidden')
     statusLight.style.backgroundImage='linear-gradient(161deg,rgb(0, 0, 0),rgb(255, 0, 0))'
@@ -721,6 +746,7 @@ async function apiRequestForCustomizations(url){
     document.querySelector('.menuWrapper').classList.add('loading')
     document.querySelector('.customerArea').classList.add('hidden')
     try{
+        
         const response = await fetch(url)
         document.querySelector('.menuWrapper').classList.add('loading')
         document.querySelector('.customerArea').classList.add('hidden')
@@ -1047,16 +1073,14 @@ function processCustom(element,value,click){
                         if(value.includes('syrup')){
                             let abbr = value.split('syrup')[0].toUpperCase()
                             const before = elem.innerText.split(' ')
-                            let after
-                            if(drinkIsIced[drinkNum] === true && drink.iced) after = drink.iced.pumps[drink.iced.syrup.indexOf(abbr)][translateSize(drink.iced.size)]
-                            if(drinkIsIced[drinkNum] === false && drink.hot) after = drink.hot.pumps[drink.hot.syrup.indexOf(abbr)][translateSize(drink.hot.size)]
-                            
+                            let after = Number(currentQuantity.join(''))
                             before.forEach((elem,i)=>{
                                 if(i!==0){
                                     after += ` ${elem}`
                                 }
+
                             })
-                            elem.innerText=after
+                            document.querySelector('.selectedSpecific').innerText=after
                         }
                     })
                 }
@@ -1277,7 +1301,7 @@ function changeHotAndIced(drink,element,value){
                     drink[bool].milk.forEach((val,i)=>{
                         
                         //console.log(value.split('w/').join('').split('XTR').join(''))
-                        console.log(val.includes(value.split('w/').join('').split('XTR').join('')))
+                        console.log(val.includes(value.split('w/').join('').split('XTR').join('').split('LT').join('').split('SUB').join('').split('NO').join('')))
                         if((val.includes('w/') || val.includes('XTR') || val.includes('LT') || val.includes('NO') || val.includes('SUB')) && val.includes(value.split('w/').join('').split('XTR').join('').split('LT').join('').split('SUB').join('').split('NO').join(''))){
                             console.log('word' + bool)
                             drink[bool].milk[i]=value
@@ -1713,4 +1737,3 @@ function pseudoClick(element){
     
     
 }
-

@@ -1,26 +1,17 @@
-
- 
-
-
-
+const API_URL = 'https://meekandev-github-io.onrender.com';
 
 function nameShortener(name){
-    
-    let bob= name.toLowerCase().split('').filter((elem)=>{
-        if(elem.toString().charCodeAt()-96 > 0 && elem.toString().charCodeAt()-96 < 27){
-            return elem
-        }
-    }).join('')
-    return bob
-    
+    if(name.length > 15){
+        return name.slice(0,15) + '...'
+    }else{
+        return name
+    }
 }
 
-let heroku = 'https://coffee-trainer.herokuapp.com/api/coredrinks'
-let local = 'http://localhost:8000/api/coredrinks'
 async function apiRequest(){
     
     try{
-        const response = await fetch(heroku)
+        const response = await fetch(`${API_URL}/api/coredrinks`)
         const data = await response.json()
 
         Object.keys(data).forEach((element)=>{
@@ -264,12 +255,5 @@ async function apiRequest(){
         console.log(error)
     }
 }
-
-
-
-
-
-
-
 
 apiRequest()
